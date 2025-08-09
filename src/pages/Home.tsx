@@ -2,38 +2,86 @@ import React from 'react';
 import {
   IonButton,
   IonContent,
-  IonPage
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  useIonToast
 } from '@ionic/react';
 import './Home.css';
-import {CFEnvironment, CFPaymentGateway, CFSession, CFWebCheckoutPayment} from "@awesome-cordova-plugins/cashfree-pg";
+import {CFEnvironment, CFPaymentGateway, CFSession, CFSubscriptionPayment, CFSubscriptionSession, CFWebCheckoutPayment} from "@awesome-cordova-plugins/cashfree-pg";
 
 const Home: React.FC = () => {
+  const [presentToast] = useIonToast();
+  const showToast = (message: string, color: string = 'primary') => {
+    presentToast({
+      message,
+      duration: 3000,
+      position: 'top',
+      color
+    });
+  };
   const initiateWebPayment = () =>  {
     const callbacks = {
       onVerify: function (result:any) {
         console.log("This is in the Application Verify: " + JSON.stringify(result));
-
+        showToast("Payment verified successfully!", "success");
       },
       onError: function (error:any){
         console.log("This is in the Application Error: " + JSON.stringify(error));
+        showToast("Payment failed: " + JSON.stringify(error), "danger");
       }
     };
     CFPaymentGateway.setCallback(callbacks)
     CFPaymentGateway.doWebCheckoutPayment(
         new CFWebCheckoutPayment(
-            new CFSession("session_4XVrK_y25_lqUKIcln8TLzBYID1wBpcZqFXH9IywnEtVzPRheOW6D8OfGnCIIdTPmuYa-Rg77aDqE3rGB_XzHRZgtCLlhNDIfzWUsapmks_D",
-                "order_70512k0SWYgH11qWZGfiA9RNXiPWPmk",
+            new CFSession("session_A3ZifoLHfpO6GIRvakaY7odzncYVBI3wCeLO0fqKZ0-cshbbSZr0K0SUghHlgiSLOib-XcEfuFhNbGxEwX9DmwYIVJXmpwsJuUC9NltWqyV70W2d1FzwyFD-jD4payment",
+                "devstudio_7359654598359059419",
                 CFEnvironment.SANDBOX
             ),
             null)
     )
   }
+
+  const initiateSubscriptionPayment = () =>  {
+    const callbacks = {
+      onVerify: function (result:any) {
+        console.log("This is in the Application Verify: " + JSON.stringify(result));
+        showToast("Payment verified successfully!", "success");
+      },
+      onError: function (error:any){
+        console.log("This is in the Application Error: " + JSON.stringify(error));
+        showToast("Payment failed: " + JSON.stringify(error), "danger");
+      }
+    };
+    CFPaymentGateway.setCallback(callbacks)
+    CFPaymentGateway.doSubscriptionPayment(
+        new CFSubscriptionPayment(
+            new CFSubscriptionSession("sub_session_IWvH0f8DiwkeiXNA_LPcZ6N39SScTJ66fmJe1ViVDO8oO-9vMsSUXo7QwO03DJaw7nT0vtqYErXMBvlx_VDgUEhtmyWJjFIZREZXWQFWfG276454rc2QSDPuUuJpFd4payment",
+                "devstudio_subs_7359648847351794361",
+                CFEnvironment.SANDBOX
+            ))
+    )
+  }
   return (
     <IonPage id="home-page">
-      <IonContent fullscreen>
-        <IonButton onClick={initiateWebPayment}>
-          Initiate Web Payment
-        </IonButton>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Cashfree Payment</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
+        <div className="ion-padding-top">
+          <IonButton onClick={initiateWebPayment}>
+            Initiate Web Payment
+          </IonButton>
+        </div>
+
+         <div className="ion-padding-top">
+          <IonButton onClick={initiateSubscriptionPayment}>
+            Initiate Subscription Payment
+          </IonButton>
+        </div>
       </IonContent>
     </IonPage>
   );
