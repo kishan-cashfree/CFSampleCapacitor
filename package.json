@@ -6,25 +6,28 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "android": "npm run build && ionic capacitor run android",
+    "ios": "npm run build && ionic capacitor run ios",
     "preview": "vite preview",
     "test.e2e": "cypress run",
     "test.unit": "vitest",
     "lint": "eslint"
   },
   "dependencies": {
-    "@awesome-cordova-plugins/cashfree-pg": "^8.0.2",
-    "@awesome-cordova-plugins/core": "^8.0.2",
+    "@awesome-cordova-plugins/cashfree-pg": "^8.1.0",
+    "@awesome-cordova-plugins/core": "^8.1.0",
     "@capacitor/android": "^7.0.0",
     "@capacitor/app": "^7.0.0",
     "@capacitor/core": "^7.0.0",
     "@capacitor/haptics": "^7.0.0",
+    "@capacitor/ios": "7.4.2",
     "@capacitor/keyboard": "^7.0.0",
     "@capacitor/status-bar": "^7.0.0",
     "@ionic/react": "^8.0.0",
     "@ionic/react-router": "^8.0.0",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
-    "cordova-plugin-cashfree-pg": "^1.0.11",
+    "cordova-plugin-cashfree-pg": "^1.0.11-cap",
     "ionicons": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -47,8 +50,8 @@
     "jsdom": "^22.1.0",
     "terser": "^5.4.0",
     "typescript": "^5.1.6",
-    "vite": "~5.2.0",
-    "vitest": "^0.34.6"
+    "vite": "^5.4.19",
+    "vitest": "^3.2.4"
   },
   "description": "An Ionic project"
 }
