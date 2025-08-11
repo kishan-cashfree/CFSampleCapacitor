@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { version } from "react";
 import {
   IonButton,
   IonContent,
@@ -6,63 +6,81 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
-  useIonToast
-} from '@ionic/react';
-import './Home.css';
-import {CFEnvironment, CFPaymentGateway, CFSession, CFSubscriptionPayment, CFSubscriptionSession, CFWebCheckoutPayment} from "@awesome-cordova-plugins/cashfree-pg";
+  useIonToast,
+} from "@ionic/react";
+import "./Home.css";
+import { CFPaymentGateway } from "capacitor-plugin-cashfree-pg";
+import {
+  CFEnvironment,
+  CFSession,
+  CFSubscriptionCheckoutPayment,
+  CFSubscriptionSession,
+  CFWebCheckoutPayment,
+} from "cashfree-pg-api-contract";
 
 const Home: React.FC = () => {
   const [presentToast] = useIonToast();
-  const showToast = (message: string, color: string = 'primary') => {
+  const showToast = (message: string, color: string = "primary") => {
     presentToast({
       message,
       duration: 3000,
-      position: 'top',
-      color
+      position: "top",
+      color,
     });
   };
-  const initiateWebPayment = () =>  {
-    const callbacks = {
-      onVerify: function (result:any) {
-        console.log("This is in the Application Verify: " + JSON.stringify(result));
+  const initiateWebPayment = async () => {
+    let session = new CFSession(
+      "session_A3ZifoLHfpO6GIRvakaY7odzncYVBI3wCeLO0fqKZ0-cshbbSZr0K0SUghHlgiSLOib-XcEfuFhNbGxEwX9DmwYIVJXmpwsJuUC9NltWqyV70W2d1FzwyFD-jD4payment",
+      "devstudio_7359654598359059419",
+      CFEnvironment.SANDBOX
+    );
+    let payment = new CFWebCheckoutPayment(session, null);
+    try {
+      let result = await CFPaymentGateway.doWebCheckoutPayment(payment);
+      if (result.error) {
+        console.log(
+          "This is in the Application Error: " + JSON.stringify(result.error)
+        );
+        showToast("Payment failed: " + JSON.stringify(result.error), "danger");
+      } else {
+        console.log(
+          "This is in the Application Verify: " + JSON.stringify(result)
+        );
         showToast("Payment verified successfully!", "success");
-      },
-      onError: function (error:any){
-        console.log("This is in the Application Error: " + JSON.stringify(error));
-        showToast("Payment failed: " + JSON.stringify(error), "danger");
       }
-    };
-    CFPaymentGateway.setCallback(callbacks)
-    CFPaymentGateway.doWebCheckoutPayment(
-        new CFWebCheckoutPayment(
-            new CFSession("session_A3ZifoLHfpO6GIRvakaY7odzncYVBI3wCeLO0fqKZ0-cshbbSZr0K0SUghHlgiSLOib-XcEfuFhNbGxEwX9DmwYIVJXmpwsJuUC9NltWqyV70W2d1FzwyFD-jD4payment",
-                "devstudio_7359654598359059419",
-                CFEnvironment.SANDBOX
-            ),
-            null)
-    )
-  }
+    } catch (error) {
+      console.error(
+        "This is in the Application Error: " + error
+      );
+      showToast("Payment failed: " + error, "danger");
+    }
+  };
 
-  const initiateSubscriptionPayment = () =>  {
-    const callbacks = {
-      onVerify: function (result:any) {
-        console.log("This is in the Application Verify: " + JSON.stringify(result));
-        showToast("Payment verified successfully!", "success");
-      },
-      onError: function (error:any){
-        console.log("This is in the Application Error: " + JSON.stringify(error));
-        showToast("Payment failed: " + JSON.stringify(error), "danger");
-      }
-    };
-    CFPaymentGateway.setCallback(callbacks)
-    CFPaymentGateway.doSubscriptionPayment(
-        new CFSubscriptionPayment(
-            new CFSubscriptionSession("sub_session_IWvH0f8DiwkeiXNA_LPcZ6N39SScTJ66fmJe1ViVDO8oO-9vMsSUXo7QwO03DJaw7nT0vtqYErXMBvlx_VDgUEhtmyWJjFIZREZXWQFWfG276454rc2QSDPuUuJpFd4payment",
-                "devstudio_subs_7359648847351794361",
-                CFEnvironment.SANDBOX
-            ))
-    )
-  }
+  const initiateSubscriptionPayment = async () => {
+    let subscriptionSession = new CFSubscriptionSession(
+      "sub_session_E2ZZvtNv2U7PobKhRxonbDDxM1OsFbHN-SCuVqVdBHEB7RQq9VoWbRssF0upE9L75BdH_eNYvz_hKegtGL95W-z7Wv9mQ0oev7SU-2xQITKdbgwhGaBQ1EgipWvWRkEpayment",
+      "devstudio_subs_7360624140226997342",
+      CFEnvironment.PRODUCTION
+    );
+    let subscriptionPayment = new CFSubscriptionCheckoutPayment(
+      subscriptionSession,
+      null
+    );
+    let result = await CFPaymentGateway.doSubscriptionPayment(
+      subscriptionPayment
+    );
+    if (result.error) {
+      console.log(
+        "This is in the Application Error: " + JSON.stringify(result.error)
+      );
+      showToast("Payment failed: " + JSON.stringify(result.error), "danger");
+    } else {
+      console.log(
+        "This is in the Application Verify: " + JSON.stringify(result)
+      );
+      showToast("Payment verified successfully!", "success");
+    }
+  };
   return (
     <IonPage id="home-page">
       <IonHeader>
@@ -77,7 +95,7 @@ const Home: React.FC = () => {
           </IonButton>
         </div>
 
-         <div className="ion-padding-top">
+        <div className="ion-padding-top">
           <IonButton onClick={initiateSubscriptionPayment}>
             Initiate Subscription Payment
           </IonButton>
